@@ -101,24 +101,21 @@ module testbench();
     begin
 	if(DataAdr === 736 & WriteData === 1024 & R7 === 1024) begin //Valida a posição final de memoria, seu conteudo e o R7
 		$display("Simulation succeeded");
-		$display("Posicao da memoria: ", DataAdr);
-		$display("Conteudo da memoria: ", WriteData);
+			$display("Posicao da memoria: ", DataAdr); // Display Posicao da memoria
+			$display("Conteudo da memoria: ", WriteData); // Display Conteudo da memoria
           	$stop;
-        end else if (DataAdr !== 96) begin
-          $display("Simulation failed");
-          $stop;
-        end
+	end
     end
 endmodule
 
 module top(input  logic        clk, reset, 
-           output logic [31:0] WriteData, DataAdr, 
+	   output logic [31:0] WriteData, DataAdr, R7 // Registrador R7 acrescentado
            output logic        MemWrite);
 
   logic [31:0] PC, Instr, ReadData;
   
   // instantiate processor and memories
-  arm arm(clk, reset, PC, Instr, MemWrite, DataAdr, 
+	arm arm(clk, reset, PC, Instr, MemWrite, DataAdr, R7 // R7 adicionado 
           WriteData, ReadData);
   imem imem(PC, Instr);
   dmem dmem(clk, MemWrite, DataAdr, WriteData, ReadData);
@@ -151,7 +148,7 @@ module arm(input  logic        clk, reset,
            output logic [31:0] PC,
            input  logic [31:0] Instr,
            output logic        MemWrite,
-           output logic [31:0] ALUResult, WriteData,
+	   output logic [31:0] ALUResult, WriteData, R7 // Acrescimo R7
            input  logic [31:0] ReadData);
 
   logic [3:0] ALUFlags;
@@ -162,13 +159,13 @@ module arm(input  logic        clk, reset,
   controller c(clk, reset, Instr[31:12], ALUFlags, 
                RegSrc, RegWrite, ImmSrc, 
                ALUSrc, ALUControl,
-               MemWrite, MemtoReg, PCSrc);
+	       MemWrite, MemtoReg, PCSrc,Shift); // Shift add no COntrol UNit
   datapath dp(clk, reset, 
               RegSrc, RegWrite, ImmSrc,
               ALUSrc, ALUControl,
               MemtoReg, PCSrc,
               ALUFlags, PC, Instr,
-              ALUResult, WriteData, ReadData);
+	      ALUResult,R7, WriteData, ReadData,SHift); // R7 e Shift add ao datapath
 endmodule
 
 module controller(input  logic         clk, reset,
@@ -181,15 +178,16 @@ module controller(input  logic         clk, reset,
                   output logic [1:0]   ALUControl,
                   output logic         MemWrite, MemtoReg,
                   output logic         PCSrc);
+		  output logic	       Shift); // SHIFT add sinal de controle  (saida do Control Unit)
 
   logic [1:0] FlagW;
-  logic       PCS, RegW, MemW;
+  logic       PCS, RegW, MemW,NoWrite; // Adiciona o sinal de controle NoWrite no Decoder
   
   decoder dec(Instr[27:26], Instr[25:20], Instr[15:12],
               FlagW, PCS, RegW, MemW,
-              MemtoReg, ALUSrc, ImmSrc, RegSrc, ALUControl);
+              MemtoReg, ALUSrc, ImmSrc, RegSrc, ALUControl,Shift);
   condlogic cl(clk, reset, Instr[31:28], ALUFlags,
-               FlagW, PCS, RegW, MemW,
+               FlagW, PCS, RegW, MemW,NoWrite, // Adiciona o sinal de controle NoWrite no Conditional Logic
                PCSrc, RegWrite, MemWrite);
 endmodule
 
@@ -255,6 +253,7 @@ module condlogic(input  logic       clk, reset,
                  input  logic [3:0] ALUFlags,
                  input  logic [1:0] FlagW,
                  input  logic       PCS, RegW, MemW,
+		 input 	logic       NoWrite, // SInal de controle addicionado
                  output logic       PCSrc, RegWrite, MemWrite);
                  
   logic [1:0] FlagWrite;
@@ -269,7 +268,7 @@ module condlogic(input  logic       clk, reset,
   // write controls are conditional
   condcheck cc(Cond, Flags, CondEx);
   assign FlagWrite = FlagW & {2{CondEx}};
-  assign RegWrite  = RegW  & CondEx;
+  assign RegWrite  = RegW  & CondEx & ~NoWrite; // Nowrite add na AND do RegWrite
   assign MemWrite  = MemW  & CondEx;
   assign PCSrc     = PCS   & CondEx;
 endmodule    
