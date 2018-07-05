@@ -78,11 +78,11 @@ module testbench();
   logic        clk;
   logic        reset;
 
-  logic [31:0] WriteData, DataAdr;
+	logic [31:0] WriteData, DataAdr, R7;	//Acrescentamos o R7
   logic        MemWrite;
 
   // instantiate device to be tested
-  top dut(clk, reset, WriteData, DataAdr, MemWrite);
+	top dut(clk, reset, WriteData, DataAdr, R7, MemWrite);	//Acrescentamos o R7
   
   // initialize test
   initial
@@ -99,15 +99,15 @@ module testbench();
   // check results
   always @(negedge clk)
     begin
-      if(MemWrite) begin
-        if(DataAdr === 100 & WriteData === 7) begin
-          $display("Simulation succeeded");
-          $stop;
+	if(DataAdr === 736 & WriteData === 1024 & R7 === 1024) begin //Valida a posição final de memoria, seu conteudo e o R7
+		$display("Simulation succeeded");
+		$display("Posicao da memoria: ", DataAdr);
+		$display("Conteudo da memoria: ", WriteData);
+          	$stop;
         end else if (DataAdr !== 96) begin
           $display("Simulation failed");
           $stop;
         end
-      end
     end
 endmodule
 
