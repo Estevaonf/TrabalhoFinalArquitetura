@@ -1,8 +1,8 @@
 INICIA					
-	XOR	R5, R5      	; Zera registrador             
-	XOR	R7, R7    	;             
-	XOR	R0, R0	    	;              
-	XOR	R4, R4	    	;               	  		
+	AND	R5, R5, 0      	; Zera registrador             
+	AND	R7, R7, 0    	;             
+	AND	R0, R0, 0    	;              
+	AND	R4, R4, 0    	;               	  		
         
 	ADD 	R5, R5, #2    	; R5 recebe Numero base da PG (2)           	
 	ADD 	R7, R7, R5    	; Valor da PG deve ser adicionado no registrador da dupla              			
