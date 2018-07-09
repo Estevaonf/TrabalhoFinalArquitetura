@@ -109,13 +109,13 @@ module testbench();
 endmodule
 
 module top(input  logic        clk, reset, 
-	   output logic [31:0] WriteData, DataAdr, R7 // Registrador R7 acrescentado
+	   output logic [31:0] WriteData, DataAdr, R7, // Registrador R7 acrescentado
            output logic        MemWrite);
 
   logic [31:0] PC, Instr, ReadData;
   
   // instantiate processor and memories
-	arm arm(clk, reset, PC, Instr, MemWrite, DataAdr, R7 // R7 adicionado 
+	arm arm(clk, reset, PC, Instr, MemWrite, DataAdr, R7, // R7 adicionado 
           WriteData, ReadData);
   imem imem(PC, Instr);
   dmem dmem(clk, MemWrite, DataAdr, WriteData, ReadData);
@@ -148,7 +148,7 @@ module arm(input  logic        clk, reset,
            output logic [31:0] PC,
            input  logic [31:0] Instr,
            output logic        MemWrite,
-	   output logic [31:0] ALUResult, WriteData, R7 // Acrescimo R7
+	   output logic [31:0] ALUResult, WriteData, R7, // Acrescimo R7
            input  logic [31:0] ReadData);
 
   logic [3:0] ALUFlags;
