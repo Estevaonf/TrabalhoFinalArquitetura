@@ -165,7 +165,7 @@ module arm(input  logic        clk, reset,
               ALUSrc, ALUControl,
               MemtoReg, PCSrc,
               ALUFlags, PC, Instr,
-	      ALUResult,R7, WriteData, ReadData,SHift); // R7 e Shift add ao datapath
+	      ALUResult,R7, WriteData, ReadData,Shift); // R7 e Shift add ao datapath
 endmodule
 
 module controller(input  logic         clk, reset,
