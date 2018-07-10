@@ -436,6 +436,14 @@ module flopr #(parameter WIDTH = 8)
     else       q <= d;
 endmodule
 
+module shifter(	input logic [31:0] In,   //implementação do shifter
+		input logic [4:0] shamt5,
+		output logic [31:0] Out);
+
+  assign Out = In << shamt5;
+endmodule
+
+
 module mux2 #(parameter WIDTH = 8)
              (input  logic [WIDTH-1:0] d0, d1, 
               input  logic             s, 
