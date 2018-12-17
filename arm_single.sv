@@ -369,7 +369,7 @@ module datapath(input  logic        clk, reset,
   extend      ext(Instr[23:0], ImmSrc, ExtImm);
 	
   // shifter
-  shifter     shifter(SrcA,Instr[11:7],ShiftResult); //LSL
+	shifter     shifter(SrcA,Instr[11:7],ShiftResult, Instr[25]); //LSL
 
   // ALU logic
   mux2 #(32)  srcbmux(WriteData, ExtImm, ALUSrc, SrcB);
@@ -451,9 +451,15 @@ endmodule
 //LSL
 module shifter(	input logic [31:0] In,
 		input logic [4:0] shamt5,
-		output logic [31:0] Out);
-
+	        output logic [31:0] Out,
+	        input logic imed);
+always_comb
+	if(imed == 0){
   assign Out = In << shamt5;
+	}else{
+		Out = In;
+	}
+			
 endmodule
 
 module alu(input  logic [31:0] a, b,
